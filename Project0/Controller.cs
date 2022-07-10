@@ -1,0 +1,5 @@
+namespace Wordle {
+    class Controller{
+        
+    }
+}
