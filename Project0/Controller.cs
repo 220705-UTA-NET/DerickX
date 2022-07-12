@@ -1,5 +1,7 @@
-namespace Wordle {
-    class Controller{
-        
+namespace Wordle 
+{
+    class Controller
+    {
+
     }
 }
