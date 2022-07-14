@@ -37,7 +37,7 @@ namespace Wordle
             // System.Console.WriteLine("Welcome to Wordle!");
             SelectWord();
             
-            while (numGuess < maxGuess || !won)
+            while (numGuess < maxGuess && !won)
             {
                 MainLoop();
             }
@@ -52,20 +52,11 @@ namespace Wordle
             System.Console.WriteLine($"{numGuess}/6");
             System.Console.WriteLine("Please guess a 5 letter word: ");
             */
-            /*
             string guess = controller.GetGuess();
 
-            if (!Regex.IsMatch(guess, @"^[a-zA-Z]+$"))
-            {
-                throw new ArgumentOutOfRangeException(nameof(guess), "Guess must only be alphabetic characters");
-            }
-            else if (guess.size() != 5)
-            {
-                throw new ArgumentOutOfRangeException(nameof(guess), "Guess must be a 5-letter word");
-            }
             try
             {
-                validity = CheckGuess(guess);
+                CheckGuess(guess);
                 numGuess++;
                 // view.DisplayResult(guess, validity);
             }
@@ -74,19 +65,21 @@ namespace Wordle
                 // view.InvalidGuess(ex);
                 // Console.WriteLine(ex.Message);
             }
-            */
         }
 
-        public void SelectWord()
+        private void SelectWord()
         {
             Random random = new Random();
             word = wordList.ElementAt(random.Next(wordList.Count));
+            System.Console.WriteLine(word);
         }
-        public void CheckGuess(string guess)
+        private void CheckGuess(string guess)
         {
+            System.Console.WriteLine("in CheckGuess()");
             bool[] marked = {false, false, false, false, false};
             for (int i = 0; i < WORD_SIZE; i++)
             {
+                System.Console.WriteLine(i);
                 if (guess[i] == word[i]) {
                     validity[i] = guessStates.Correct;
                 }
@@ -125,6 +118,14 @@ namespace Wordle
             {
                 System.Console.WriteLine(validity[i]);
             }
+
+            for (int i = 0; i < WORD_SIZE; i++)
+            {
+                if (validity[i] != guessStates.Correct) {
+                    return;
+                }
+            }
+            won = true;
         }
 
     }
