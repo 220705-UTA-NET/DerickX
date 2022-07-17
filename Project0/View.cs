@@ -1,0 +1,7 @@
+namespace Wordle
+{
+    class View
+    {
+
+    }
+}

@@ -5,7 +5,9 @@ namespace Wordle
         public GreenLetter(char letter) : base(letter) {}
         public override void DisplayLetter()
         {
-            System.Console.WriteLine("\032[44m\032[37m Test \032[0m");
+            System.Console.ForegroundColor = System.ConsoleColor.Green;
+            System.Console.Write(letter);
+            System.Console.ResetColor();
         }
     }
 }

@@ -2,7 +2,7 @@ namespace Wordle
 {
     abstract class Letter 
     {
-        private char letter;
+        protected char letter;
 
         public Letter(char letter)
         {
