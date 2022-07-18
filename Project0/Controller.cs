@@ -17,7 +17,25 @@ namespace Wordle
             {
                 throw new ArgumentOutOfRangeException(nameof(guess), "Guess not in word list");
             }
-            return guess;
+            return guess.ToLower();
+        }
+
+        public bool PlayAgain()
+        {
+            string response = System.Console.ReadLine();
+            response = response.ToLower();
+            if (response == "y")
+            {
+                return true;
+            }
+            else if (response == "n")
+            {
+                return false;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(response), "Invalid response (y/n)");
+            }
         }
     }
 }

@@ -2,23 +2,21 @@ namespace Wordle
 {
     class Model
     {
-        private const uint WORD_SIZE = 5;
+        public const uint WORD_SIZE = 5;
         private string word;
         private Controller controller;
-        private View view;
-        private int numGuess;
-        private int maxGuess;
+        private uint numGuess;
+        private uint maxGuess;
         private string guess;
         private Letter[] validity;
         private bool won;
         public HashSet<string> wordList;
-        public Model(int maxGuess=6) {
+        public Model(uint maxGuess=6) {
             wordList = new HashSet<string>(File
                 .ReadLines(@"./wordlist.txt")
                 .Select(line => line.Trim())
                 .Where(line => !string.IsNullOrEmpty(line)), StringComparer.OrdinalIgnoreCase);
             this.controller = new Controller();
-            this.view = new View();
             this.numGuess = 0;
             this.maxGuess = maxGuess;
             this.validity = new Letter[WORD_SIZE];
@@ -27,36 +25,52 @@ namespace Wordle
 
         public void RunGame()
         {
-            // view.StartPrompt();
-            // System.Console.WriteLine("Welcome to Wordle!");
-            SelectWord();
+            View.StartPrompt();
             
-            while (numGuess < maxGuess && !won)
+            bool play = true;
+            do
             {
-                MainLoop();
-            }
+                SelectWord();
+                won = false;
+                numGuess = 0;
+                Array.Clear(validity, 0, validity.Length);
+            
+                while (numGuess < maxGuess && !won)
+                {
+                    MainLoop();
+                }
 
-            // view.EndPrompt(won);
+                View.EndPrompt(won);
+                bool errored = true;
+                while (errored) {
+                    try 
+                    {
+                        play = controller.PlayAgain();
+                        errored = false;
+                    }
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        View.OutOfRangeMessage(ex);
+                        errored = true;
+                    }
+                }
+            } while (play);
+            
         }
 
         private void MainLoop()
         {
-            // view.MainPrompt();
-            /*
-            System.Console.WriteLine($"{numGuess}/6");
-            System.Console.WriteLine("Please guess a 5 letter word: ");
-            */
+            View.MainPrompt(numGuess);
             try
             {
                 string guess = controller.GetGuess(wordList);
                 CheckGuess(guess);
                 numGuess++;
-                // view.DisplayResult(guess, validity);
+                View.DisplayResult(guess, validity);
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                // view.InvalidGuess(ex);
-                Console.WriteLine(ex.Message);
+                View.OutOfRangeMessage(ex);
             }
         }
 
@@ -103,12 +117,6 @@ namespace Wordle
                     }
                 }
             }
-
-            for (int i = 0; i < WORD_SIZE; i++)
-            {
-                validity[i].DisplayLetter();
-            }
-            System.Console.WriteLine();
 
             for (int i = 0; i < WORD_SIZE; i++)
             {
