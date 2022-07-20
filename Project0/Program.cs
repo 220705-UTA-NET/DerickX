@@ -5,7 +5,8 @@
         static void Main(string[] args)
         {
             // Declare Objects.
-            Model model = new Model();
+            IRepository repo = new SqlRepository("Your Connection String Here");
+            Model model = new Model(repo);
             // Game Loop?
             // model.RunGame();
             model.RunGame();

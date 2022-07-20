@@ -2,29 +2,44 @@ namespace Wordle
 {
     class Model
     {
-        public const uint WORD_SIZE = 5;
         private string word;
-        private Controller controller;
         private uint numGuess;
-        private uint maxGuess;
-        private string guess;
+        private const uint maxGuess = 6;
         private Letter[] validity;
         private bool won;
+        private IRepository repo;
         public HashSet<string> wordList;
-        public Model(uint maxGuess=6) {
+        public User? currUser;
+        public const uint WORD_SIZE = 5;
+        
+        public Model(IRepository repo, uint maxGuess=6) {
             wordList = new HashSet<string>(File
                 .ReadLines(@"./wordlist.txt")
                 .Select(line => line.Trim())
                 .Where(line => !string.IsNullOrEmpty(line)), StringComparer.OrdinalIgnoreCase);
-            this.controller = new Controller();
             this.numGuess = 0;
-            this.maxGuess = maxGuess;
             this.validity = new Letter[WORD_SIZE];
             this.won = false;
+            this.repo = repo;
         }
 
         public void RunGame()
         {
+            View.AskName();
+            bool userError = true;
+            while (userError)
+            {
+                try
+                {
+                    currUser = repo.GetUser(Controller.CheckUser());
+                    userError = false;
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    View.OutOfRangeMessage(ex);
+                }
+            }
+
             View.StartPrompt();
             
             bool play = true;
@@ -40,18 +55,21 @@ namespace Wordle
                     MainLoop();
                 }
 
+                UpdateStats(won);
+                repo.InsertUser(currUser);
+                View.DisplayStats(currUser);
+
                 View.EndPrompt(won);
-                bool errored = true;
-                while (errored) {
+                bool endError = true;
+                while (endError) {
                     try 
                     {
-                        play = controller.PlayAgain();
-                        errored = false;
+                        play = Controller.PlayAgain();
+                        endError = false;
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         View.OutOfRangeMessage(ex);
-                        errored = true;
                     }
                 }
             } while (play);
@@ -63,7 +81,7 @@ namespace Wordle
             View.MainPrompt(numGuess);
             try
             {
-                string guess = controller.GetGuess(wordList);
+                string guess = Controller.GetGuess(wordList);
                 CheckGuess(guess);
                 numGuess++;
                 View.DisplayResult(guess, validity);
@@ -125,6 +143,21 @@ namespace Wordle
                 }
             }
             won = true;
+        }
+
+        private void UpdateStats(bool won)
+        {
+            if (won)
+            {
+                currUser.wins++;
+                currUser.streak++;
+                currUser.guessNums[numGuess - 1]++;
+            }
+            else
+            {
+                currUser.losses++;
+                currUser.streak = 0;
+            }
         }
 
     }

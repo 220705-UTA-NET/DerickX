@@ -36,5 +36,17 @@ namespace Wordle
         {
             Console.WriteLine(ex.Message);
         }
+
+        public static void DisplayStats(User user)
+        {
+            Console.WriteLine($"Wins: {user.wins}, Losses: {user.losses}, Current Streak: {user.streak}");
+            Console.WriteLine("|Guess 1|Guess 2|Guess 3|Guess 4|Guess 5|Guess 6|");
+            Console.WriteLine($"    {user.guessNums[0]}       {user.guessNums[1]}       {user.guessNums[2]}       {user.guessNums[3]}       {user.guessNums[4]}       {user.guessNums[5]}");
+        }
+
+        public static void AskName()
+        {
+            Console.WriteLine("Please enter your username.");
+        }
     }
 }
