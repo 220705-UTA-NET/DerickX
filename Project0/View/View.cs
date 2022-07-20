@@ -9,17 +9,17 @@ namespace Wordle
 
         public static void MainPrompt(uint numGuess)
         {
-            System.Console.Write($"{numGuess}/6 ");
+            System.Console.Write($"{numGuess + 1}/6 ");
         }
 
         public static void EndPrompt(bool won)
         {
             if (won) {
-                System.Console.WriteLine("Congratulations, Play Again?");
+                System.Console.WriteLine("Congratulations, Play Again? (y/n)");
             }
             else
             {
-                System.Console.WriteLine("Sorry, Try Again?");
+                System.Console.WriteLine("Sorry, Try Again? (y/n)");
             }
         }
         

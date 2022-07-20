@@ -2,35 +2,27 @@ using System.Data.SqlClient;
 
 namespace Wordle
 {
-    public class SqlRepository : IRepository //by extending the interface, this class agrees to fulfill all the methods of the interface.
+    public class SqlRepository : IRepository
     {
-        // Fields
-
-        // your connection string has all the details needed to connect to a database
         private readonly string connectionString;
 
-        //the readonly modifier allows us to set a value in the constructor, then prevents modification.
-
-
-
-        // Constuctor
         public SqlRepository( string connectionString)
         {
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
-        //Methods
 
         public void InsertUser(User user)
         {
-            // a SQLConnection object is created to connect to the database, and is provided the connection string
             using SqlConnection connection = new SqlConnection(this.connectionString);
     
             connection.Open();
 
+            // Check if the user already exists.
             SqlCommand check_ID = new SqlCommand("SELECT * FROM Wordle.Users WHERE Name = @Name", connection);
             check_ID.Parameters.AddWithValue("@Name", user.name);
             SqlDataReader reader = check_ID.ExecuteReader();
 
+            // If they already exist, update their stats.
             if(reader.HasRows)
             {
                 reader.Close();
@@ -51,7 +43,7 @@ namespace Wordle
                 cmd.Parameters.AddWithValue("@Name", user.name);
                 cmd.ExecuteNonQuery();
             }
-            else
+            else // Otherwise put them into the database.
             {
                 reader.Close();
 
@@ -79,6 +71,7 @@ namespace Wordle
             connection.Close();
         }
 
+        // Importing user stats.
         public User GetUser(string name)
         {
             User tmpUser = new User(name);

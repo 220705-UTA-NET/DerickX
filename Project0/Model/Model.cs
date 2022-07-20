@@ -25,6 +25,7 @@ namespace Wordle
 
         public void RunGame()
         {
+            // Setup current user.
             View.AskName();
             bool userError = true;
             while (userError)
@@ -40,11 +41,12 @@ namespace Wordle
                 }
             }
 
+            // Game Loop.
             View.StartPrompt();
-            
             bool play = true;
             do
             {
+                // Variable initialization that needs to be done before every new game.
                 SelectWord();
                 won = false;
                 numGuess = 0;
@@ -55,10 +57,12 @@ namespace Wordle
                     MainLoop();
                 }
 
+                // Stats get pushed to the database after every game.
                 UpdateStats(won);
                 repo.InsertUser(currUser);
                 View.DisplayStats(currUser);
 
+                // Asking to play again.
                 View.EndPrompt(won);
                 bool endError = true;
                 while (endError) {
@@ -78,6 +82,7 @@ namespace Wordle
 
         private void MainLoop()
         {
+            // Check validity of guess, then evaluate.
             View.MainPrompt(numGuess);
             try
             {
@@ -100,14 +105,18 @@ namespace Wordle
         }
         private void CheckGuess(string guess)
         {
+            // Marks if letter was already used to grant yellow status to a letter in the guess.
             bool[] marked = {false, false, false, false, false};
+            
             for (int i = 0; i < WORD_SIZE; i++)
             {
+                // Letter is in correct spot.
                 if (guess[i] == word[i]) {
                     validity[i] = new GreenLetter(guess[i]);
                 }
                 else
                 {
+                    // See if letter has an unmarked version in main word.
                     string copy = word;
                     bool set = false;
                     int index = -1;
@@ -129,13 +138,10 @@ namespace Wordle
                             break;
                         }
                     }
-                    if (!set)
-                    {
-                        validity[i] = new RedLetter(guess[i]);
-                    }
                 }
             }
 
+            // Check if guess was a win.
             for (int i = 0; i < WORD_SIZE; i++)
             {
                 if (!(validity[i] is GreenLetter)) {
